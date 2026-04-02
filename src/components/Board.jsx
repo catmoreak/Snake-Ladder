@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import QuitPopup from "./QuitPopup";
+import boardAsset from "../assets/board.svg";
 
 export default function Board({ players }) {
   const [number, setNumber] = useState(null);
@@ -191,67 +192,41 @@ export default function Board({ players }) {
     const rowSquares = [];
     for (let col = 0; col < 10; col++) {
       const index = row % 2 === 0 ? 10 * row + col : 10 * (row + 1) - col - 1;
-      const currentValue = index + 1;
-      const ladderStart = ladders[currentValue];
-      const snakeStart = snakes[currentValue];
-      rowSquares.push({
-        number: currentValue,
-        ladderStart,
-        snakeStart,
-      });
+      rowSquares.push({ number: index + 1 });
     }
     grid.push(rowSquares);
   }
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[7fr,3fr]">
-      <div className="flex items-center justify-center bg-[#0a192f]">
-        <div className="game-card overflow-hidden p-1 bg-black/40 rounded-2xl shadow-2xl">
-          <div className="grid grid-cols-10 gap-1 md:gap-2">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#12335f_0%,#0a192f_45%,#06101f_100%)] lg:grid lg:grid-cols-[7fr,3fr]">
+      <div className="flex items-center justify-center p-2 md:p-3 lg:p-2">
+        <div
+          className="game-card real-board-shell overflow-hidden p-2 md:p-3 rounded-2xl"
+        >
+          <div className="real-board-frame">
+            <div className="real-board-surface relative grid grid-cols-10">
+            <img
+              src={boardAsset}
+              alt="Snake and ladder board"
+              className="absolute inset-0 z-0 w-full h-full object-cover pointer-events-none select-none"
+            />
+            <div className="board-vignette pointer-events-none absolute inset-0 z-10" />
+            <div className="board-glare pointer-events-none absolute inset-0 z-10" />
             {grid.flat().map((cell, index) => {
               const playersOnSquare = positions
                 .map((position, i) => (position === cell.number ? i : -1))
                 .filter((i) => i !== -1);
 
-              let cellStyle = "bg-[#233554]/50";
-              let numberColor = "text-[#64ffda]";
-
-              if (tasks.includes(cell.number)) {
-                cellStyle = "bg-purple-900/50 border-purple-500";
-                numberColor = "text-purple-200 font-bold";
-              } else if (cell.ladderStart) {
-                cellStyle = "bg-[#64ffda]/10 border-[#64ffda]";
-              } else if (cell.snakeStart) {
-                cellStyle = "bg-red-500/10 border-red-500";
-              }
-
               return (
                 <div
                   key={index}
-                  className={`flex flex-col justify-center items-center w-[25px] h-[25px] sm:w-[35px] sm:h-[35px] md:w-[44px] md:h-[44px] lg:w-[60px] lg:h-[60px] ${cellStyle} border-2 border-[#233554] rounded-lg backdrop-blur-sm hover:bg-opacity-40`}
+                  className="relative z-20 flex flex-col justify-center items-center w-[40px] h-[40px] sm:w-[52px] sm:h-[52px] md:w-[66px] md:h-[66px] lg:w-[90px] lg:h-[90px] border border-[#13253f]/30 bg-white/[0.015]"
                 >
-                  <span
-                    className={`absolute top-0.5 left-0.5 md:top-1 md:left-1 text-[12px] sm:text-md md:text-md font-medieval ${numberColor}`}
-                  >
-                    {cell.number}
-                  </span>
-                  <div className="absolute bottom-1 right-0 flex items-center justify-center">
-                    {cell.ladderStart && (
-                      <span className="text-2xl sm:text-2xl md:text-2xl">
-                        🪜
-                      </span>
-                    )}
-                    {cell.snakeStart && (
-                      <span className="text-2xl sm:text-2xl md:text-2xl">
-                        🐍
-                      </span>
-                    )}
-                  </div>
                   <div>
                     {playersOnSquare.map((player, index) => (
                       <div
                         key={player}
-                        className={`absolute flex w-6 h-6 sm:w-4 sm:h-4 md:w-6 md:h-6 lg:w-6 lg:h-6 rounded-full border border-[#64ffda]/30 items-center justify-center text-[8px] sm:text-[10px] md:text-xs font-bold shadow-lg cursor-pointer transform transition-all duration-100 ${playerColors[player]} hover:scale-110`}
+                        className={`absolute flex w-8 h-8 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full border border-[#64ffda]/30 items-center justify-center text-[10px] sm:text-xs md:text-sm lg:text-base font-bold shadow-lg cursor-pointer transform transition-all duration-100 ${playerColors[player]} hover:scale-110`}
                         style={{
                           top: `50%`,
                           left: `50%`,
@@ -265,22 +240,23 @@ export default function Board({ players }) {
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-[#112240]/90 flex flex-col justify-center space-y-4 md:space-y-8">
+      <div className="bg-[#112240]/90 border-l border-[#29406b] flex flex-col justify-center px-3 py-4 md:px-4 md:py-6 lg:px-5 lg:py-8 space-y-3 md:space-y-4 overflow-y-auto">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-[#64ffda] font-medieval">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#64ffda] font-medieval tracking-wide">
             FINITE LOOP <span className="text-white">CLUB </span>
           </h1>
-          <p className="text-sm text-gray-400">Snake & Ladder Championship</p>
+          <p className="text-sm text-[#b7c6e6] tracking-wide">Snake & Ladder Championship</p>
         </div>
         <button
           onClick={() => {
             setShowPopup(true);
           }}
-          className="w-full px-6 py-2 border border-[#64ffda] bg-[#ff1b1b]/50 font-medieval text-sm md:text-base font-semibold text-[#112240] bg-#112240 rounded-lg transition-all transform duration-75 hover:bg-[#ff1b1b]/80"
+          className="w-full px-4 py-2 border border-[#ff8a8a] bg-[#d63838] text-white font-mono text-xs md:text-sm font-semibold rounded-lg transition-all duration-200 hover:bg-[#ef4444] hover:shadow-[0_8px_20px_rgba(239,68,68,0.35)]"
         >
           Quit Game
         </button>
@@ -294,34 +270,34 @@ export default function Board({ players }) {
         {!winner ? (
           <>
             {taskPlayers[turn] && (
-              <div className="text-center bg-[#233554]/50 border border-[#64ffda] shadow-lg shadow-[#64ffda]/10">
-                <p className="text-lg md:text-xl text-[#64ffda] animate-pulse font-medieval">
+              <div className="text-center rounded-lg p-2 bg-[#233554]/60 border border-[#64ffda] shadow-lg shadow-[#64ffda]/10">
+                <p className="text-base md:text-lg text-[#64ffda] animate-pulse font-medieval tracking-wide">
                   You have a task to perform!
                 </p>
               </div>
             )}
 
-            <div className="game-card text-center bg-[#233554]/50 border border-[#233554] rounded-lg p-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 font-medieval">
+            <div className="game-card text-center bg-[#233554]/60 border border-[#2f4778] rounded-xl p-4 shadow-lg">
+              <h2 className="text-lg md:text-2xl font-bold text-white mb-2 font-medieval tracking-wide">
                 Team {turn}'s Turn
               </h2>
               <div
-                className={`w-6 h-6 md:w-8 md:h-8 ${playerColors[turn - 1]} rounded-full mx-auto shadow-lg`}
+                className={`w-5 h-5 md:w-6 md:h-6 ${playerColors[turn - 1]} rounded-full mx-auto shadow-lg`}
               />
             </div>
 
             {eventMessage && (
               <div
-                className={`game-card text-center text-xl md:text-2xl font-bold ${eventMessage === "SNAKE!" ? "text-red-500" : "text-[#64ffda]"} animate-bounce-slow bg-[#233554]/50 border border-[#233554]`}
+                className={`game-card text-center text-base md:text-xl font-bold ${eventMessage === "SNAKE!" ? "text-red-500" : "text-[#64ffda]"} animate-bounce-slow bg-[#233554]/50 border border-[#233554]`}
               >
                 {eventMessage}
               </div>
             )}
 
-            <div className="h-auto p-2 flex items-center justify-center space-y-4 md:space-y-6 bg-[#233554]/50 border border-[#233554]">
+            <div className="h-auto p-4 rounded-xl flex items-center justify-center bg-[#233554]/60 border border-[#2f4778] shadow-lg">
               {stayPlayers.includes(turn) ? (
                 <div
-                  className="text-lg md:text-xl font-mono text-red-500 text-center cursor-pointer hover:text-opacity-80"
+                   className="text-base md:text-lg font-mono text-red-400 text-center cursor-pointer hover:text-red-300"
                   onClick={() => changeTurnWhenMissed()}
                 >
                   You Miss Your Turn!
@@ -329,7 +305,7 @@ export default function Board({ players }) {
               ) : (
                 <div className="text-center">
                   <div
-                    className={`flex items-center justify-center rounded-sm w-12 h-12 md:w-16 md:h-16 text-xl md:text-2xl mx-auto mb-4 md:mb-6 bg-[#64ffda] text-black font-extrabold ${rolling ? "animate-bounce-slow" : ""} ${!showButtons && !rolling ? "hover:scale-110 cursor-pointer hover:bg-[#2dffce] hover:text-[#112240]" : "opacity-80 cursor-not-allowed"}`}
+                     className={`flex items-center justify-center rounded-lg w-12 h-12 md:w-14 md:h-14 text-lg md:text-xl mx-auto mb-3 md:mb-4 bg-[#64ffda] text-[#0b2547] font-extrabold shadow-[0_10px_25px_rgba(100,255,218,0.35)] ${rolling ? "animate-bounce-slow" : ""} ${!showButtons && !rolling ? "hover:scale-110 cursor-pointer hover:bg-[#8bffe4]" : "opacity-80 cursor-not-allowed"}`}
                     onClick={rollDice}
                   >
                     {number || "?"}
@@ -339,14 +315,14 @@ export default function Board({ players }) {
                     <div className="space-y-2 md:space-y-3 h-auto">
                       <button
                         onClick={handleMove}
-                        className="w-full px-6 py-2 text-sm md:text-base font-semibold text-[#112240] bg-[#64ffda] rounded-lg transition-all transform duration-75 hover:bg-[#64ffda]/90"
+                         className="w-full px-4 py-1.5 text-xs md:text-sm font-semibold text-[#112240] bg-[#64ffda] rounded-lg transition-all duration-200 hover:bg-[#86ffe2]"
                       >
                         Move
                       </button>
                       {taskPlayers[turn] && (
                         <button
                           onClick={handleStay}
-                          className="w-full px-6 py-2 text-sm md:text-base font-semibold text-[#64ffda] border border-[#64ffda] rounded-lg transition-all hover:bg-red-400/100 hover:text-black"
+                           className="w-full px-4 py-1.5 text-xs md:text-sm font-semibold text-[#64ffda] border border-[#64ffda] rounded-lg transition-all duration-200 hover:bg-[#64ffda]/10"
                         >
                           Stay
                         </button>
@@ -354,23 +330,23 @@ export default function Board({ players }) {
                     </div>
                   )}
 
-                  <p className="text-xs md:text-sm text-gray-400 mt-3 md:mt-4">
+                   <p className="text-[10px] md:text-xs text-[#b7c6e6] mt-2 md:mt-3 tracking-wide">
                     {showButtons
                       ? "Make your move or wait for next turn"
                       : rolling
                         ? "Rolling..."
-                        : "Click the dice to roll"}
+                        : "Tap the dice to roll"}
                   </p>
                 </div>
               )}
             </div>
           </>
         ) : (
-          <div className="game-card text-center p-6 md:p-8 bg-[#233554]/50 border border-[#64ffda]">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#64ffda] mb-3 md:mb-4">
-              🎉 Victory! 🎉
-            </h2>
-            <p className="text-xl md:text-2xl text-white">
+          <div className="game-card text-center p-6 md:p-8 rounded-xl bg-[#233554]/60 border border-[#64ffda] shadow-[0_14px_35px_rgba(100,255,218,0.2)]">
+             <h2 className="text-2xl md:text-3xl font-bold text-[#64ffda] mb-2 md:mb-3">
+               🎉 Victory! 🎉
+             </h2>
+            <p className="text-lg md:text-xl text-white">
               Team {winner} Wins!
             </p>
           </div>
