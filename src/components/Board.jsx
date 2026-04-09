@@ -3,12 +3,18 @@ import QuitPopup from "./QuitPopup";
 import boardAsset from "../assets/board.svg";
 
 export default function Board({ players }) {
-  const [number, setNumber] = useState(null);
+  const [number, setNumber] = useState(() => {
+    const storedNumber = JSON.parse(localStorage.getItem("activeNumber"));
+    return storedNumber || null;
+  });
   const [rolling, setRolling] = useState(false);
-  const [showButtons, setShowButtons] = useState(false);
+  const [showButtons, setShowButtons] = useState(() => {
+    const storedButtons = JSON.parse(localStorage.getItem("showButtons"));
+    return storedButtons || false;
+  });
   const [turn, setTurn] = useState(() => {
     const storedTurn = JSON.parse(localStorage.getItem("turn"));
-    if (storedTurn && storedTurn !== 1) {
+    if (storedTurn && storedTurn >= 1 && storedTurn <= players) {
       return storedTurn;
     }
     return 1;
@@ -19,6 +25,7 @@ export default function Board({ players }) {
     if (
       storedPositions &&
       Array.isArray(storedPositions) &&
+      storedPositions.length === players &&
       !storedPositions.every((val) => val === 0)
     ) {
       return storedPositions;
@@ -31,9 +38,26 @@ export default function Board({ players }) {
   );
 
   const [eventMessage, setEventMessage] = useState("");
-  const [taskPlayers, setTaskPlayers] = useState({});
-  const [winner, setWinner] = useState(null);
-  const [stayPlayers, setStayPlayers] = useState([]);
+  const [taskPlayers, setTaskPlayers] = useState(() => {
+    const storedTaskPlayers = JSON.parse(localStorage.getItem("taskPlayers"));
+    return storedTaskPlayers || {};
+  });
+  const [winner, setWinner] = useState(() => {
+    const storedPositions = JSON.parse(localStorage.getItem("positions"));
+    if (
+      storedPositions &&
+      Array.isArray(storedPositions) &&
+      storedPositions.length === players
+    ) {
+      const idx = storedPositions.findIndex((p) => p === 100);
+      if (idx !== -1) return idx + 1;
+    }
+    return null;
+  });
+  const [stayPlayers, setStayPlayers] = useState(() => {
+    const storedStay = JSON.parse(localStorage.getItem("stayPlayers"));
+    return storedStay || [];
+  });
 
   const playerColors = [
     "bg-gradient-to-r from-blue-500 to-blue-600",
@@ -74,7 +98,11 @@ export default function Board({ players }) {
   useEffect(() => {
     localStorage.setItem("positions", JSON.stringify(positions));
     localStorage.setItem("turn", JSON.stringify(turn));
-  }, [positions]);
+    localStorage.setItem("stayPlayers", JSON.stringify(stayPlayers));
+    localStorage.setItem("taskPlayers", JSON.stringify(taskPlayers));
+    localStorage.setItem("activeNumber", JSON.stringify(number));
+    localStorage.setItem("showButtons", JSON.stringify(showButtons));
+  }, [positions, turn, stayPlayers, taskPlayers, number, showButtons]);
 
   const rollDice = () => {
     if (rolling || showButtons) return;
@@ -140,6 +168,8 @@ export default function Board({ players }) {
             return updated;
           });
         }
+      } else {
+        event = "Need exact roll!";
       }
       setEventMessage(event);
       return newPositions;
@@ -175,6 +205,10 @@ export default function Board({ players }) {
     localStorage.removeItem("positions");
     localStorage.removeItem("players");
     localStorage.removeItem("turn");
+    localStorage.removeItem("stayPlayers");
+    localStorage.removeItem("taskPlayers");
+    localStorage.removeItem("activeNumber");
+    localStorage.removeItem("showButtons");
     window.location.reload();
   };
 
