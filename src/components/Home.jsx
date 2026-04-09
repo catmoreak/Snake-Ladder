@@ -4,7 +4,7 @@ import Board from "./Board";
 export default function Home() {
   const [players, setPlayers] = useState(() => {
     const storedPlayers = localStorage.getItem("players");
-    return storedPlayers ? storedPlayers : 0;
+    return storedPlayers ? parseInt(storedPlayers,10) : 0;
   });
   const clicked = (x) => {
     setPlayers(x);

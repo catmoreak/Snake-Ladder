@@ -220,13 +220,13 @@ export default function Board({ players }) {
               return (
                 <div
                   key={index}
-                  className="relative z-20 flex flex-col justify-center items-center w-[40px] h-[40px] sm:w-[52px] sm:h-[52px] md:w-[66px] md:h-[66px] lg:w-[90px] lg:h-[90px] border border-[#13253f]/30 bg-white/[0.015]"
+                  className="relative z-20 flex flex-col justify-center items-center w-[32px] h-[32px] sm:w-[42px] sm:h-[42px] md:w-[54px] md:h-[54px] lg:w-[72px] lg:h-[72px] border border-[#13253f]/30 bg-white/[0.015]"
                 >
                   <div>
                     {playersOnSquare.map((player, index) => (
                       <div
                         key={player}
-                        className={`absolute flex w-8 h-8 sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10 rounded-full border border-[#64ffda]/30 items-center justify-center text-[10px] sm:text-xs md:text-sm lg:text-base font-bold shadow-lg cursor-pointer transform transition-all duration-100 ${playerColors[player]} hover:scale-110`}
+                        className={`absolute flex w-6 h-6 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-8 lg:h-8 rounded-full border border-[#64ffda]/30 items-center justify-center text-[8px] sm:text-[9px] md:text-xs lg:text-sm font-bold shadow-lg cursor-pointer transform transition-all duration-100 ${playerColors[player]} hover:scale-110`}
                         style={{
                           top: `50%`,
                           left: `50%`,
