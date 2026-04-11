@@ -2,26 +2,36 @@ import { useState, useEffect } from "react";
 import QuitPopup from "./QuitPopup";
 import boardAsset from "../assets/board.svg";
 
+function parseStored(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null || raw === "") return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
 export default function Board({ players }) {
   const [number, setNumber] = useState(() => {
-    const storedNumber = JSON.parse(localStorage.getItem("activeNumber"));
-    return storedNumber || null;
+    const storedNumber = parseStored("activeNumber", null);
+    return typeof storedNumber === "number" ? storedNumber : null;
   });
   const [rolling, setRolling] = useState(false);
   const [showButtons, setShowButtons] = useState(() => {
-    const storedButtons = JSON.parse(localStorage.getItem("showButtons"));
-    return storedButtons || false;
+    const storedButtons = parseStored("showButtons", false);
+    return typeof storedButtons === "boolean" ? storedButtons : false;
   });
   const [turn, setTurn] = useState(() => {
-    const storedTurn = JSON.parse(localStorage.getItem("turn"));
-    if (storedTurn && storedTurn >= 1 && storedTurn <= players) {
+    const storedTurn = parseStored("turn", null);
+    if (typeof storedTurn === "number" && storedTurn >= 1 && storedTurn <= players) {
       return storedTurn;
     }
     return 1;
   });
 
   const [positions, setPositions] = useState(() => {
-    const storedPositions = JSON.parse(localStorage.getItem("positions"));
+    const storedPositions = parseStored("positions", null);
     if (
       storedPositions &&
       Array.isArray(storedPositions) &&
@@ -39,11 +49,13 @@ export default function Board({ players }) {
 
   const [eventMessage, setEventMessage] = useState("");
   const [taskPlayers, setTaskPlayers] = useState(() => {
-    const storedTaskPlayers = JSON.parse(localStorage.getItem("taskPlayers"));
-    return storedTaskPlayers || {};
+    const storedTaskPlayers = parseStored("taskPlayers", null);
+    return storedTaskPlayers && typeof storedTaskPlayers === "object" && !Array.isArray(storedTaskPlayers)
+      ? storedTaskPlayers
+      : {};
   });
   const [winner, setWinner] = useState(() => {
-    const storedPositions = JSON.parse(localStorage.getItem("positions"));
+    const storedPositions = parseStored("positions", null);
     if (
       storedPositions &&
       Array.isArray(storedPositions) &&
@@ -55,8 +67,8 @@ export default function Board({ players }) {
     return null;
   });
   const [stayPlayers, setStayPlayers] = useState(() => {
-    const storedStay = JSON.parse(localStorage.getItem("stayPlayers"));
-    return storedStay || [];
+    const storedStay = parseStored("stayPlayers", null);
+    return Array.isArray(storedStay) ? storedStay : [];
   });
 
   const playerColors = [
@@ -127,6 +139,9 @@ export default function Board({ players }) {
   };
 
   const handleMove = () => {
+    if (!showButtons || typeof number !== "number" || number < 1 || number > 6) {
+      return;
+    }
     if (stayPlayers.includes(turn)) {
       setStayPlayers((prevStayPlayers) =>
         prevStayPlayers.filter((player) => player !== turn),
